@@ -8,5 +8,6 @@ Included:
   - test infrastructure (mocha, chai, testdouble)
   - ping and about routers (with tests)
   - `src/server.js` with basic restify setup
+  - `src/errors.js` with app-level error basics
   - `index.js` with basic clustering
 
