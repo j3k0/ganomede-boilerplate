@@ -29,7 +29,7 @@ const parseLogLevel = (envValue) => {
 };
 
 module.exports = {
-  name: 'wordsaxe',
+  name: pkg.name,
   logLevel: parseLogLevel(process.env.BUNYAN_LEVEL),
 
   http: {
@@ -38,10 +38,5 @@ module.exports = {
       ? parseInt(process.env.PORT, 10)
       : 8000,
     prefix: `/${pkg.api}`
-  },
-
-  data: {
-    host: process.env.DATA_PORT_8080_TCP_ADDR || '127.0.0.1',
-    port: parseInt(process.env.DATA_PORT_8080_TCP_PORT, 10) || 8080
   }
 };
