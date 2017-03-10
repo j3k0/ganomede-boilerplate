@@ -8,6 +8,7 @@ td.print = (what) => {
   console.log('%s', message); // eslint-disable-line no-console
 };
 
+global.__ganomede_test = true;
 global.td = td;
 global.expect = expect;
 
