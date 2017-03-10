@@ -47,10 +47,23 @@ const logger = require('./logger');
 //      });
 //    };
 
+// Values for error#severity: how to print it inside `sendHttpError`.
+// https://github.com/j3k0/ganomede/issues/11
+// https://github.com/trentm/node-bunyan#levels
+const severity = {
+  fatal: 'fatal',  // (60): The service/app is going to stop or become unusable now. An operator should definitely look into this soon.
+  error: 'error',  // (50): Fatal for a particular request, but the service/app continues servicing other requests. An operator should look at this soon(ish).
+  warn: 'warn',    // (40): A note on something that should probably be looked at by an operator eventually.
+  info: 'info',    // (30): Detail on regular operation.
+  debug: 'debug',  // (20): Anything else, i.e. too verbose to be included in "info" level.
+  trace: 'trace'   // (10): Logging from external libraries used by your app or very detailed application logging.
+};
+
 class GanomedeError extends Error {
   constructor (...messageArgs) {
     super();
     this.name = this.constructor.name;
+    this.severity = severity.error;
 
     if (messageArgs.length > 0)
       this.message = util.format.apply(util, messageArgs);
@@ -78,6 +91,7 @@ class RequestValidationError extends GanomedeError {
     super(...messageArgs);
     this.name = name;
     this.statusCode = 400;
+    this.severity = severity.info;
   }
 }
 
@@ -85,6 +99,7 @@ class InvalidAuthTokenError extends GanomedeError {
   constructor () {
     super('Invalid auth token');
     this.statusCode = 401;
+    this.severity = severity.info;
   }
 }
 
@@ -92,6 +107,7 @@ class InvalidCredentialsError extends GanomedeError {
   constructor () {
     super('Invalid credentials');
     this.statusCode = 401;
+    this.severity = severity.info;
   }
 }
 
@@ -106,20 +122,40 @@ const toRestError = (error) => {
   });
 };
 
+const captureStack = () => {
+  const o = {};
+  Error.captureStackTrace(o, captureStack);
+  return o.stack;
+};
+
 // Kept forgetting `next` part, so let's change this to (next, err).
 const sendHttpError = (next, err) => {
   // When we have an instance of GanomedeError, it means stuff that's defined here, in this file.
   // So those have `statusCode` and convertable to rest errors.
   // In case they don't, we die (because programmers error ("upcast" it) not runtime's).
-  //
-  // We also don't need to log them, because these are normal situations
-  // (like UserNotFound or BadRequest, though, feel free to change this.)
   if (err instanceof GanomedeError) {
-    logger.debug(err);
+    logger[err.severity](err);
     return next(toRestError(err));
   }
 
-  logger.error(err);
+  // # Printing
+  //
+  // We mostly upcast our app-logic errors to GanomedeError,
+  // but some things may come up as restify.HttpError
+  // (e.g. InternalServerError instance may end up here).
+  // So we treat them with "error" severity.
+  //
+  // # Stack Trace
+  // https://github.com/j3k0/ganomede-boilerplate/issues/10
+  // https://github.com/j3k0/ganomede-directory/issues/15
+  //
+  // With restify errors, which we usually create ourselves,
+  // stack points to the right place, but in some cases,
+  // we can get error that was created on different event loop tick.
+  //
+  // Though we rely on lower levels to print those kinds of errors,
+  // we still must know the place sendHttpError was called from.
+  logger.error(err, {sendHttpErrorStack: captureStack()});
   next(err);
 };
 
@@ -128,5 +164,6 @@ module.exports = {
   RequestValidationError,
   InvalidAuthTokenError,
   InvalidCredentialsError,
-  sendHttpError
+  sendHttpError,
+  severity
 };
