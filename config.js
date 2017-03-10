@@ -41,7 +41,7 @@ const parseApiSecret = () => {
 
 module.exports = {
   name: pkg.name,
-  logLevel: parseLogLevel(process.env.BUNYAN_LEVEL),
+  logLevel: parseLogLevel(process.env.LOG_LEVEL),
   secret: process.env.hasOwnProperty('API_SECRET') && parseApiSecret(),
 
   http: {
