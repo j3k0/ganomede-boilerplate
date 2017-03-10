@@ -1,7 +1,7 @@
 'use strict';
 
 const supertest = require('supertest');
-const createServer = require('../src/server');
+const createServer = require('../src/create-server');
 const ping = require('../src/ping.router');
 const config = require('../config');
 

@@ -7,7 +7,7 @@ const curtain = require('curtain-down');
 const config = require('./config');
 const about = require('./src/about.router');
 const ping = require('./src/ping.router');
-const createServer = require('./src/server');
+const createServer = require('./src/create-server');
 const logger = require('./src/logger');
 
 const master = () => {

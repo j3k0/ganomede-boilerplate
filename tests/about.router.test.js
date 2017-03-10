@@ -1,7 +1,7 @@
 'use strict';
 
 const supertest = require('supertest');
-const createServer = require('../src/server');
+const createServer = require('../src/create-server');
 const about = require('../src/about.router');
 const config = require('../config');
 const pkg = require('../package.json');
