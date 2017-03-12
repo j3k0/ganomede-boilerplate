@@ -10,6 +10,7 @@
     "startw": "nodemon --watch src/ --watch index.js --watch config.js --exec 'npm start'",
     "test": "LOG_LEVEL=ERROR mocha --bail --no-exit --throw-deprecation tests/helper.js 'tests/**/*.test.js'",
     "testw": "nodemon --watch src/ --watch tests/ --watch config.js --exec 'npm test'",
+    "coverage": "istanbul cover _mocha -- -b tests/ && istanbul report",
     "lint": "eslint src/ tests/ index.js config.js"
   },
   "repository": {
@@ -26,6 +27,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "eslint": "^3.8.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
     "nodemon": "^1.11.0",
     "supertest": "^3.0.0",
