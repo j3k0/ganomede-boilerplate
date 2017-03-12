@@ -6,7 +6,9 @@ const pkg = require('./package.json');
 
 const parseLogLevel = (envValue) => {
   const defaultLevel = 'INFO';
-  const desiredLevel = envValue ? String(envValue) : defaultLevel;
+  const desiredLevel = envValue
+    ? String(envValue).toUpperCase()
+    : defaultLevel;
   const levels = [
     'FATAL',
     'ERROR',
