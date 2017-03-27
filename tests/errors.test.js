@@ -21,7 +21,7 @@ describe('errors', () => {
       );
     });
 
-    it('captures stack traces on non GanomedeErrors', (done) => {
+    it('captures stack traces on errors', (done) => {
       // Say we have database module.
       const db = {
         doWork (cb) {
@@ -40,7 +40,7 @@ describe('errors', () => {
 
       // Logger should know from where sendHttpError was called.
       td.replace('../src/logger', {
-        error (error, {sendHttpErrorStack}) {
+        error ({error}, {sendHttpErrorStack}) {
           // Even though it is not in original error,
           // we still know where to look (file, line, function name).
           expect(error.stack).to.not.include('at sendHttpError');

@@ -130,22 +130,6 @@ const captureStack = () => {
 
 // Kept forgetting `next` part, so let's change this to (next, err).
 const sendHttpError = (next, err) => {
-  // When we have an instance of GanomedeError, it means stuff that's defined here, in this file.
-  // So those have `statusCode` and convertable to rest errors.
-  // In case they don't, we die (because programmers error ("upcast" it) not runtime's).
-  if (err instanceof GanomedeError) {
-    logger[err.severity](err);
-    return next(toRestError(err));
-  }
-
-  // # Printing
-  //
-  // We mostly upcast our app-logic errors to GanomedeError,
-  // but some things may come up as restify.HttpError
-  // (e.g. InternalServerError instance may end up here).
-  // So we treat them with "error" severity.
-  //
-  // # Stack Trace
   // https://github.com/j3k0/ganomede-boilerplate/issues/10
   // https://github.com/j3k0/ganomede-directory/issues/15
   //
@@ -155,8 +139,22 @@ const sendHttpError = (next, err) => {
   //
   // Though we rely on lower levels to print those kinds of errors,
   // we still must know the place sendHttpError was called from.
-  logger.error(err, {sendHttpErrorStack: captureStack()});
-  next(err);
+  const stack = {sendHttpErrorStack: captureStack()};
+
+  // When we have an instance of GanomedeError, it means stuff that's defined here, in this file.
+  // So those have `statusCode` and convertable to rest errors.
+  // In case they don't, we die (because programmers error ("upcast" it) not runtime's).
+  const isGanomedeError = err instanceof GanomedeError;
+  const error = isGanomedeError ? toRestError(err) : err;
+
+  // We mostly upcast our app-logic errors to GanomedeError,
+  // but some things may come up as restify.HttpError
+  // (e.g. InternalServerError instance may end up here).
+  // So we treat them with "error" severity.
+  const level = isGanomedeError ? err.severity : 'error';
+
+  logger[level]({error}, stack);
+  next(error);
 };
 
 module.exports = {
