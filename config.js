@@ -54,3 +54,6 @@ module.exports = {
     prefix: `/${pkg.api}`
   }
 };
+
+if (!module.parent)
+  require('./src/utils').debugPrint(module.exports);
