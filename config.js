@@ -45,6 +45,7 @@ module.exports = {
   name: pkg.name,
   logLevel: parseLogLevel(process.env.LOG_LEVEL),
   secret: process.env.hasOwnProperty('API_SECRET') && parseApiSecret(),
+  production: process.env.NODE_ENV === 'production',
 
   http: {
     host: process.env.HOST || '0.0.0.0',

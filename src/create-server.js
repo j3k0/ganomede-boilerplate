@@ -66,7 +66,7 @@ module.exports = () => {
   server.use(setRequestId);
 
   // Audit requests
-  server.on('after', filteredLogger(process.env.NODE_ENV === 'production',
+  server.on('after', filteredLogger(config.production,
     restify.auditLogger({log: logger, body: true})));
 
   return server;
