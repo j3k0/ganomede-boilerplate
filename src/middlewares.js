@@ -2,13 +2,13 @@
 
 const lodash = require('lodash');
 const restify = require('restify');
-const {InvalidAuthTokenError, InvalidCredentialsError, sendHttpError} = require('./errors');
+const {InvalidAuthTokenError, InvalidCredentialsError, sendHttpError} = require('ganomede-errors');
 const logger = require('./logger');
 
 const requireSecret = (req, res, next) => {
   return req.ganomede.secretMatches
     ? next()
-    : sendHttpError(next, new InvalidCredentialsError());
+    : sendHttpError(logger, next, new InvalidCredentialsError());
 };
 
 const parseUserIdFromSecretToken = (secret, token) => {
@@ -20,7 +20,7 @@ const parseUserIdFromSecretToken = (secret, token) => {
 const requireAuth = ({authdbClient, secret = false, paramName = 'token'} = {}) => (req, res, next) => {
   const token = lodash.get(req, `params.${paramName}`);
   if (!token)
-    return sendHttpError(next, new InvalidAuthTokenError());
+    return sendHttpError(logger, next, new InvalidAuthTokenError());
 
   const spoofed = secret && parseUserIdFromSecretToken(secret, token);
   if (spoofed) {
@@ -32,11 +32,11 @@ const requireAuth = ({authdbClient, secret = false, paramName = 'token'} = {}) =
   authdbClient.getAccount(token, (err, redisResult) => {
     if (err) {
       logger.error('authdbClient.getAccount("%j") failed', token, err);
-      return sendHttpError(next, new restify.InternalServerError());
+      return sendHttpError(logger, next, new restify.InternalServerError());
     }
 
     if (!redisResult)
-      return sendHttpError(next, new InvalidCredentialsError());
+      return sendHttpError(logger, next, new InvalidCredentialsError());
 
     // Authdb already JSON.parsed redisResult for us,
     // but sometimes it is a string with user id,
@@ -46,7 +46,7 @@ const requireAuth = ({authdbClient, secret = false, paramName = 'token'} = {}) =
       : redisResult.username; // userId used to be username from profile
 
     if (!redisResult)
-      return sendHttpError(next, new InvalidCredentialsError());
+      return sendHttpError(logger, next, new InvalidCredentialsError());
 
     req.ganomede.userId = userId;
     return next();

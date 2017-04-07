@@ -1,6 +1,6 @@
 'use strict';
 
-const restify = require('restify');
+const {RestError} = require('restify-errors');
 const middlewares = require('../src/middlewares');
 
 describe('Middlewares', () => {
@@ -11,7 +11,7 @@ describe('Middlewares', () => {
 
     it('calls next(error) if secret was not matched', (done) => {
       middlewares.requireSecret({ganomede: {secretMatches: false}}, {}, (err) => {
-        expect(err).to.be.instanceof(restify.RestError);
+        expect(err).to.be.instanceof(RestError);
         expect(err).to.have.property('restCode', 'InvalidCredentialsError');
         done();
       });
@@ -63,7 +63,7 @@ describe('Middlewares', () => {
         .thenCallback(null, null);
 
       mw(req, {}, (err) => {
-        expect(err).to.be.instanceof(restify.RestError);
+        expect(err).to.be.instanceof(RestError);
         expect(err).to.have.property('restCode', 'InvalidCredentialsError');
         expect(req.ganomede).to.not.have.property('secretMatches');
         done();
@@ -80,7 +80,7 @@ describe('Middlewares', () => {
         .thenCallback(null, null);
 
       mw(req, {}, (err) => {
-        expect(err).to.be.instanceof(restify.RestError);
+        expect(err).to.be.instanceof(RestError);
         expect(err).to.have.property('restCode', 'InvalidCredentialsError');
         expect(req.ganomede).to.not.have.property('secretMatches');
         done();
@@ -89,7 +89,7 @@ describe('Middlewares', () => {
 
     it('token is missing', (done) => {
       mw({params: Object.create(null)}, {}, (err) => {
-        expect(err).to.be.instanceof(restify.RestError);
+        expect(err).to.be.instanceof(RestError);
         expect(err).to.have.property('restCode', 'InvalidAuthTokenError');
         done();
       });

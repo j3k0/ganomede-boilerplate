@@ -30,6 +30,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
     "nodemon": "^1.11.0",
+    "restify-errors": "^4.3.0",
     "supertest": "^3.0.0",
     "testdouble": "^2.1.2"
   },
@@ -37,6 +38,7 @@
     "async": "^2.1.2",
     "bunyan": "^1.8.1",
     "curtain-down": "^1.0.0",
+    "ganomede-errors": "^1.0.0",
     "lodash": "^4.17.2",
     "node-statsd": "^0.1.1",
     "restify": "^4.1.1",
