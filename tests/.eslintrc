@@ -3,6 +3,6 @@ env:
 
 globals:
   td: false
-  assert: true
+  assert: false
   expect: false
   __ganomede_test: false
